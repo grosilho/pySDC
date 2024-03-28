@@ -23,16 +23,24 @@ from pySDC.projects.Monodomain.transfer_classes.my_BaseTransfer import my_base_t
 from pySDC.projects.Monodomain.controller_classes.my_controller_MPI import my_controller_MPI as controller_MPI
 from pySDC.projects.Monodomain.controller_classes.my_controller_nonMPI import my_controller_nonMPI as controller_nonMPI
 
-from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order as imexexp_1st_order_ExpRK
-from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order_mass import imexexp_1st_order_mass as imexexp_1st_order_mass_ExpRK
+from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import (
+    imexexp_1st_order as imexexp_1st_order_ExpRK,
+)
+from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order_mass import (
+    imexexp_1st_order_mass as imexexp_1st_order_mass_ExpRK,
+)
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.imexexp_1st_order import imexexp_1st_order
 
 from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.exponential_multirate_explicit_stabilized import (
     exponential_multirate_explicit_stabilized as exponential_multirate_explicit_stabilized_ExpRK,
 )
 
-from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.multirate_explicit_stabilized import multirate_explicit_stabilized
-from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.exponential_multirate_explicit_stabilized import exponential_multirate_explicit_stabilized
+from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.multirate_explicit_stabilized import (
+    multirate_explicit_stabilized,
+)
+from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.exponential_multirate_explicit_stabilized import (
+    exponential_multirate_explicit_stabilized,
+)
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.explicit_stabilized import explicit_stabilized
 
 from pySDC.projects.Monodomain.utils.data_management import database
@@ -48,7 +56,9 @@ def get_controller(controller_params, description, time_comm, n_time_ranks, trul
     if truly_time_parallel:
         controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
     else:
-        controller = controller_nonMPI(num_procs=n_time_ranks, controller_params=controller_params, description=description)
+        controller = controller_nonMPI(
+            num_procs=n_time_ranks, controller_params=controller_params, description=description
+        )
     return controller
 
 
@@ -63,14 +73,29 @@ def print_statistics(stats, controller, problem_params, space_rank, time_comm, o
     if time_comm is None or time_comm.rank == 0:
         niters = np.array(niters).flatten()
         controller.logger.info("Mean number of iterations: %4.2f" % np.mean(niters))
-        controller.logger.info("Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters))))
+        controller.logger.info(
+            "Std and var for number of iterations: %4.2f -- %4.2f" % (float(np.std(niters)), float(np.var(niters)))
+        )
         timing = np.mean(np.array(timing))
         controller.logger.info(f"Time to solution: {timing:6.4f} sec.")
 
     from pySDC.projects.Monodomain.utils.visualization_tools import show_residual_across_simulation
 
-    pre_ref = problem_params["pre_refinements"][0] if type(problem_params["pre_refinements"]) is list else problem_params["pre_refinements"]
-    out_folder = problem_params["output_root"] + "/" + problem_params["domain_name"] + "/ref_" + str(pre_ref) + "/" + problem_params["ionic_model_name"] + "/"
+    pre_ref = (
+        problem_params["pre_refinements"][0]
+        if type(problem_params["pre_refinements"]) is list
+        else problem_params["pre_refinements"]
+    )
+    out_folder = (
+        problem_params["output_root"]
+        + "/"
+        + problem_params["domain_name"]
+        + "/ref_"
+        + str(pre_ref)
+        + "/"
+        + problem_params["ionic_model_name"]
+        + "/"
+    )
     os.makedirs(out_folder, exist_ok=True)
     fname = out_folder + f"{output_file_name}_residuals.png"
     if space_rank == 0:
@@ -84,8 +109,12 @@ def print_dofs_stats(space_rank, time_rank, controller, P, uinit):
     if space_rank == 0 and time_rank == 0:
         controller.logger.info(f"Total dofs: {tot_dofs}, mesh dofs = {mesh_dofs}")
         for i, d in enumerate(data):
-            controller.logger.info(f"Processor {i}: tot_mesh_dofs = {d[0]:.2e}, n_loc_mesh_dofs = {d[1]:.2e}, n_mesh_ghost_dofs = {d[2]:.2e}, %ghost = {100*d[3]:.2f}")
-        controller.logger.info(f"Average    : tot_mesh_dofs = {avg_data[0]:.2e}, n_loc_mesh_dofs = {avg_data[1]:.2e}, n_mesh_ghost_dofs = {avg_data[2]:.2e}, %ghost = {100*avg_data[3]:.2f}")
+            controller.logger.info(
+                f"Processor {i}: tot_mesh_dofs = {d[0]:.2e}, n_loc_mesh_dofs = {d[1]:.2e}, n_mesh_ghost_dofs = {d[2]:.2e}, %ghost = {100*d[3]:.2f}"
+            )
+        controller.logger.info(
+            f"Average    : tot_mesh_dofs = {avg_data[0]:.2e}, n_loc_mesh_dofs = {avg_data[1]:.2e}, n_mesh_ghost_dofs = {avg_data[2]:.2e}, %ghost = {100*avg_data[3]:.2f}"
+        )
 
 
 def get_P_data(controller, truly_time_parallel):
@@ -142,7 +171,16 @@ def get_controller_params(problem_params, space_rank, n_time_ranks):
     return controller_params
 
 
-def get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params):
+def get_description(
+    integrator,
+    problem_params,
+    sweeper_params,
+    level_params,
+    step_params,
+    base_transfer_params,
+    space_transfer_class,
+    space_transfer_params,
+):
     description = dict()
 
     if integrator != "ES":
@@ -229,7 +267,9 @@ def get_sweeper_params(num_nodes, skip_residual_computation):
 
 def get_space_tranfer_params(problem_params, iorder, rorder, fine_to_coarse):
     if problem_params["space_disc"] == 'FEM':
-        from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfFEniCSxVectors import TransferVectorOfFEniCSxVectors
+        from pySDC.projects.Monodomain.transfer_classes.TransferVectorOfFEniCSxVectors import (
+            TransferVectorOfFEniCSxVectors,
+        )
 
         space_transfer_class = TransferVectorOfFEniCSxVectors
         space_transfer_params = dict()
@@ -247,7 +287,9 @@ def get_space_tranfer_params(problem_params, iorder, rorder, fine_to_coarse):
         space_transfer_params["rorder"] = rorder
         space_transfer_params["periodic"] = problem_params['bc'] == 'P'
         # space_transfer_params["equidist_nested"] = False
-        space_transfer_params["fine_to_coarse"] = fine_to_coarse  # how to transfer from fine to coarse space voltage and ionic model variables
+        space_transfer_params["fine_to_coarse"] = (
+            fine_to_coarse  # how to transfer from fine to coarse space voltage and ionic model variables
+        )
 
     return space_transfer_class, space_transfer_params
 
@@ -372,21 +414,36 @@ def setup_and_run(
         problem_params,
         iorder=16,
         rorder=8,
-        fine_to_coarse=['restriction', 'restriction'],  # restriction or injection, for voltage and ionic model variables
+        fine_to_coarse=[
+            'restriction',
+            'restriction',
+        ],  # restriction or injection, for voltage and ionic model variables
     )
 
     space_transfer_class, space_transfer_params = get_space_tranfer_params(
         problem_params,
         iorder=16,
         rorder=8,
-        fine_to_coarse=['restriction', 'restriction'],  # restriction or injection, for voltage and ionic model variables
+        fine_to_coarse=[
+            'restriction',
+            'restriction',
+        ],  # restriction or injection, for voltage and ionic model variables
     )
 
     # Usually do not modify below this line ------------------
     # get remaining prams
     base_transfer_params = get_base_transfer_params(finter)
     controller_params = get_controller_params(problem_params, space_rank, n_time_ranks)
-    description = get_description(integrator, problem_params, sweeper_params, level_params, step_params, base_transfer_params, space_transfer_class, space_transfer_params)
+    description = get_description(
+        integrator,
+        problem_params,
+        sweeper_params,
+        level_params,
+        step_params,
+        base_transfer_params,
+        space_transfer_class,
+        space_transfer_params,
+    )
     set_logger(controller_params)
     controller = get_controller(controller_params, description, time_comm, n_time_ranks, truly_time_parallel)
 
@@ -498,7 +555,7 @@ def main():
     space_disc = "DCT"
 
     # set level parameters
-    dt = 0.01
+    dt = 0.05
     restol = 5e-8
 
     # set problem parameters
@@ -508,11 +565,11 @@ def main():
     lin_solv_max_iter = None
     lin_solv_rtol = 1e-8
     ionic_model_name = "TTP"
-    read_init_val = False
-    init_time = 0.0
+    read_init_val = True
+    init_time = 3.0
     enable_output = False
     write_as_reference_solution = False
-    end_time = 0.04
+    end_time = 0.2
     output_root = "results_tmp"
     output_file_name = "ref_sol" if write_as_reference_solution else "monodomain"
     ref_sol = "ref_sol"
