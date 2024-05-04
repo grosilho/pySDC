@@ -15,7 +15,7 @@ def main():
     # define sweeper parameters
     options = dict()
     options["integrator"] = "IMEXEXP_EXPRK"
-    options["num_nodes"] = [8, 4, 2, 1]
+    options["num_nodes"] = [8, 4]
     options["num_sweeps"] = [1]
 
     # set step parameters
@@ -26,7 +26,7 @@ def main():
 
     # set level parameters
     # options["dt"] = 0.2
-    dt_list = [0.0125, 0.025, 0.05, 0.1]  # , 0.2]
+    dt_list = [0.0125]  # , 0.025, 0.05, 0.1]  # , 0.2]
     options["restol"] = 5e-8
 
     # set time parallelism to True or emulated (False)

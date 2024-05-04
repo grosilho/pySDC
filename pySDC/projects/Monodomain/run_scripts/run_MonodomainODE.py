@@ -79,27 +79,27 @@ def print_statistics(stats, controller, problem_params, space_rank, time_comm, o
         timing = np.mean(np.array(timing))
         controller.logger.info(f"Time to solution: {timing:6.4f} sec.")
 
-    from pySDC.projects.Monodomain.utils.visualization_tools import show_residual_across_simulation
+    # from pySDC.projects.Monodomain.utils.visualization_tools import show_residual_across_simulation
 
-    pre_ref = (
-        problem_params["pre_refinements"][0]
-        if type(problem_params["pre_refinements"]) is list
-        else problem_params["pre_refinements"]
-    )
-    out_folder = (
-        problem_params["output_root"]
-        + "/"
-        + problem_params["domain_name"]
-        + "/ref_"
-        + str(pre_ref)
-        + "/"
-        + problem_params["ionic_model_name"]
-        + "/"
-    )
-    os.makedirs(out_folder, exist_ok=True)
-    fname = out_folder + f"{output_file_name}_residuals.png"
-    if space_rank == 0:
-        show_residual_across_simulation(stats=stats, fname=fname, comm=time_comm, tend=Tend)
+    # pre_ref = (
+    #     problem_params["pre_refinements"][0]
+    #     if type(problem_params["pre_refinements"]) is list
+    #     else problem_params["pre_refinements"]
+    # )
+    # out_folder = (
+    #     problem_params["output_root"]
+    #     + "/"
+    #     + problem_params["domain_name"]
+    #     + "/ref_"
+    #     + str(pre_ref)
+    #     + "/"
+    #     + problem_params["ionic_model_name"]
+    #     + "/"
+    # )
+    # os.makedirs(out_folder, exist_ok=True)
+    # fname = out_folder + f"{output_file_name}_residuals.png"
+    # if space_rank == 0:
+    #     show_residual_across_simulation(stats=stats, fname=fname, comm=time_comm, tend=Tend)
 
 
 def print_dofs_stats(space_rank, time_rank, controller, P, uinit):

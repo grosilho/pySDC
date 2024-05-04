@@ -1,14 +1,7 @@
-import matplotlib
-
-matplotlib.use("Agg")
-
 from pySDC.helpers.stats_helper import filter_stats
 from collections import namedtuple
 
 import numpy as np
-
-from matplotlib import rc
-import matplotlib.pyplot as plt
 
 
 def sort_stats(stats, sortby_list, comm=None):
@@ -63,11 +56,23 @@ def show_residual_across_simulation(stats, fname="residuals.png", comm=None, ten
         fname (str): filename
     """
 
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from matplotlib import rc
+    import matplotlib.pyplot as plt
+
     # get residuals of the run
     extract_stats = filter_stats(stats, type="residual_post_iteration")
 
-    sortby_list = ["time", "iter", "process"]  # process is not used to sort since is similar to time, but I want to keep it in the result
-    sorted_stats = sort_stats(extract_stats, sortby_list, comm)  # not really for sorting but more for comminucating across ranks
+    sortby_list = [
+        "time",
+        "iter",
+        "process",
+    ]  # process is not used to sort since is similar to time, but I want to keep it in the result
+    sorted_stats = sort_stats(
+        extract_stats, sortby_list, comm
+    )  # not really for sorting but more for comminucating across ranks
     dt = sorted_stats[0][0][0]
     gathered_stats = tuple_to_stats(sorted_stats, sortby_list)
     del extract_stats, sortby_list, sorted_stats
